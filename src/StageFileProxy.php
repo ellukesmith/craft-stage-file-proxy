@@ -60,11 +60,12 @@ class StageFileProxy extends Plugin
             function (GetAssetUrlEvent $event) {
                 $remoteSource = getenv("STAGE_FILE_PROXY_REMOTE");
                 $assetBaseFolder = getenv("STAGE_FILE_PROXY_BASE_FOLDER") ?:'files';
+                $path = str_replace('@webroot', '', $event->asset->getVolume()->path);
 
                 if ($remoteSource) {
                     $filename = $event->asset->filename;
-                    $fileDirectory = $assetBaseFolder . '/' . $event->asset->getFolder()->path;
-                    $localeFilePath = $fileDirectory . $filename;
+                    $fileDirectory = trim($assetBaseFolder . '/' . $path, '/');
+                    $localeFilePath = $fileDirectory . '/' . $filename;                    
 
                     if (!file_exists($localeFilePath)) {
                         if (!file_exists($fileDirectory)) {
