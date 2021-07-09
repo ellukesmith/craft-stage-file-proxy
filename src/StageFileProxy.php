@@ -20,6 +20,8 @@ use yii\base\Event;
 /**
  * Class StageFileProxy
  *
+ * Modified to better handle multiple volumes and dynamic folder names
+ * 
  * @author    Wouter Van Scharen
  * @package   StageFileProxy
  * @since     1.0.0
