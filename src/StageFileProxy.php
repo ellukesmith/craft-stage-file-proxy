@@ -63,9 +63,9 @@ class StageFileProxy extends Plugin
                 $path = str_replace('@webroot', '', $event->asset->getVolume()->path);
 
                 if ($remoteSource) {
-                    $filename = $event->asset->filename;
-                    $fileDirectory = trim($assetBaseFolder . '/' . $path, '/');
-                    $localeFilePath = $fileDirectory . '/' . $filename;                    
+                    $filename = $event->asset->path;
+                    $localeFilePath = trim($assetBaseFolder . '/' . $path, '/') . '/' . $filename;       
+                    $fileDirectory = dirname($localeFilePath);                
 
                     if (!file_exists($localeFilePath)) {
                         if (!file_exists($fileDirectory)) {
