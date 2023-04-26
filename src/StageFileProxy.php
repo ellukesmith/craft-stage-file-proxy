@@ -43,7 +43,7 @@ class StageFileProxy extends Plugin
     /**
      * @var string
      */
-    public $schemaVersion = '1.0.0';
+    public string $schemaVersion = '1.0.0';
 
     // Public Methods
     // =========================================================================
@@ -58,7 +58,7 @@ class StageFileProxy extends Plugin
 
         Event::on(
             Assets::class,
-            Assets::EVENT_GET_ASSET_URL,
+            Assets::EVENT_DEFINE_THUMB_URL,
             function (GetAssetUrlEvent $event) {
                 $remoteSource = getenv("STAGE_FILE_PROXY_REMOTE");
                 $assetBaseFolder = getenv("STAGE_FILE_PROXY_BASE_FOLDER") ?: '';
