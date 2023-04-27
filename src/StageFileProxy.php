@@ -12,7 +12,7 @@ namespace liftov\stagefileproxy;
 
 use Craft;
 use craft\base\Plugin;
-use craft\events\GetAssetUrlEvent;
+use craft\events\DefineAssetThumbUrlEvent;
 use craft\services\Assets;
 
 use yii\base\Event;
@@ -59,10 +59,10 @@ class StageFileProxy extends Plugin
         Event::on(
             Assets::class,
             Assets::EVENT_DEFINE_THUMB_URL,
-            function (GetAssetUrlEvent $event) {
+            function (DefineAssetThumbUrlEvent $event) {
                 $remoteSource = getenv("STAGE_FILE_PROXY_REMOTE");
                 $assetBaseFolder = getenv("STAGE_FILE_PROXY_BASE_FOLDER") ?: '';
-                $path = str_replace('@webroot', '', $event->asset->getVolume()->path);
+                $path = str_replace('@webroot', '', $event->asset->getVolume()->getFs()->path);
 
                 if ($remoteSource) {
                     $filename = $event->asset->path;
