@@ -13,7 +13,9 @@ namespace liftov\stagefileproxy;
 use Craft;
 use craft\base\Plugin;
 use craft\events\DefineAssetThumbUrlEvent;
+use craft\events\DefineAssetUrlEvent;
 use craft\services\Assets;
+use craft\elements\Asset;
 
 use yii\base\Event;
 
@@ -59,27 +61,15 @@ class StageFileProxy extends Plugin
         Event::on(
             Assets::class,
             Assets::EVENT_DEFINE_THUMB_URL,
-            function (DefineAssetThumbUrlEvent $event) {
-                $remoteSource = getenv("STAGE_FILE_PROXY_REMOTE");
-                $assetBaseFolder = getenv("STAGE_FILE_PROXY_BASE_FOLDER") ?: '';
-                $path = str_replace('@webroot', '', $event->asset->getVolume()->getFs()->path);
+            fn(DefineAssetThumbUrlEvent $event) => $this->processAsset($event),
+            null,
+            false
+        );
 
-                if ($remoteSource) {
-                    $filename = $event->asset->path;
-                    $localeFilePath = trim($assetBaseFolder . '/' . $path, '/') . '/' . $filename;       
-                    $fileDirectory = dirname($localeFilePath);                
-
-                    if (!file_exists($localeFilePath)) {
-                        if (!file_exists($fileDirectory)) {
-                            mkdir($fileDirectory, 0775, true);
-                        }
-
-                        $remoteFilePath = $remoteSource . $localeFilePath;
-
-                        file_put_contents($localeFilePath, fopen($remoteFilePath, 'r'));
-                    }
-                }
-            },
+        Event::on(
+            Asset::class,
+            Asset::EVENT_DEFINE_URL,
+            fn(DefineAssetUrlEvent $event) => $this->processAsset($event),
             null,
             false
         );
@@ -92,5 +82,28 @@ class StageFileProxy extends Plugin
             ),
             __METHOD__
         );
+    }
+
+    private function processAsset($event)
+    {
+        $remoteSource = getenv("STAGE_FILE_PROXY_REMOTE");
+        $assetBaseFolder = getenv("STAGE_FILE_PROXY_BASE_FOLDER") ?: '';
+        $path = str_replace('@webroot', '', $event->asset->getVolume()->getFs()->path);
+
+        if ($remoteSource) {
+            $filename = $event->asset->path;
+            $localeFilePath = trim($assetBaseFolder . '/' . $path, '/') . '/' . $filename;       
+            $fileDirectory = dirname($localeFilePath);                
+
+            if (!file_exists($localeFilePath)) {
+                if (!file_exists($fileDirectory)) {
+                    mkdir($fileDirectory, 0775, true);
+                }
+
+                $remoteFilePath = $remoteSource . $localeFilePath;
+
+                file_put_contents($localeFilePath, fopen($remoteFilePath, 'r'));
+            }
+        }
     }
 }
