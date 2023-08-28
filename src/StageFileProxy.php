@@ -101,8 +101,11 @@ class StageFileProxy extends Plugin
                 }
 
                 $remoteFilePath = $remoteSource . $localeFilePath;
+                $remoteFile = @fopen($remoteFilePath, 'r');
 
-                file_put_contents($localeFilePath, fopen($remoteFilePath, 'r'));
+                if ($remoteFile) {
+                    file_put_contents($localeFilePath, $remoteFile);
+                }
             }
         }
     }
